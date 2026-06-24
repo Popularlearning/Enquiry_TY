@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>課程查詢與預約 - 大衆教室(XX分校)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        body { 
+            font-family: 'Noto Sans TC', sans-serif; 
+            background: #f0f4f8;
+            color: #1a202c;
+        }
+        .form-container {
+            animation: slideUp 0.6s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .gradient-header {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        }
+        .custom-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+        /* Custom Checkbox Style */
+        .checkbox-card input:checked + div {
+            border-color: #2563eb;
+            background-color: #eff6ff;
+            color: #1e40af;
+        }
+    </style>
+</head>
+<body class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+
+    <div class="max-w-2xl mx-auto bg-white rounded-3xl overflow-hidden custom-shadow form-container">
+        
+        <!-- Header Section -->
+        <div class="gradient-header p-8 text-center text-white relative">
+            <div class="mb-6">
+                <!-- 公司 Logo -->
+                <img src="https://static.wixstatic.com/media/76a93c_3efb0334db494c028e6ec21304b8a570~mv2.png/v1/crop/x_35,y_0,w_1244,h_613/fill/w_209,h_103,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/1_logo%20full%20color_%E6%A9%AB.png" alt="Company Logo" class="mx-auto h-24 rounded-xl bg-white p-2 shadow-sm transition hover:scale-105 duration-300">
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">課程查詢與預約系統</h1>
+            <p class="mt-3 opacity-90 text-sm sm:text-base">請填寫以下資料，專業導師將為您安排程度評估</p>
+        </div>
+
+        <form id="mainInquiryForm" class="p-6 sm:p-10 space-y-10">
+            
+            <!-- 1. Student Information -->
+            <section class="space-y-6">
+                <div class="flex items-center space-x-3 border-b border-gray-100 pb-4">
+                    <div class="bg-blue-600 text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold">1</div>
+                    <h2 class="text-xl font-bold text-gray-800">學生資料</h2>
+                </div>
+                
+                <div class="grid grid-cols-1 gap-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">學生姓名 <span class="text-red-500">*</span></label>
+                        <input type="text" id="stu_name" required 
+                               class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" 
+                               placeholder="請輸入學生中文或英文姓名">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">現就讀年級 <span class="text-red-500">*</span></label>
+                        <div class="grid grid-cols-3 sm:grid-cols-5 gap-3">
+                            <!-- Generation of Grade Buttons -->
+                            <template id="grade-template">
+                                <label class="cursor-pointer group">
+                                    <input type="radio" name="grade" value="" class="peer sr-only" required>
+                                    <div class="text-center py-2.5 border border-gray-200 rounded-xl text-gray-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-600 group-hover:border-blue-300 transition-all text-sm font-medium">
+                                        GRADE
+                                    </div>
+                                </label>
+                            </template>
+                            <div id="grade-container" class="contents">
+                                <!-- JS will fill this -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. Course Interests -->
+            <section id="courseSection" class="space-y-6 opacity-40 pointer-events-none transition-opacity duration-500">
+                <div class="flex items-center space-x-3 border-b border-gray-100 pb-4">
+                    <div class="bg-blue-600 text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold">2</div>
+                    <h2 class="text-xl font-bold text-gray-800">意向課程 (可多選)</h2>
+                </div>
+
+                <!-- KG Courses Group -->
+                <div id="kgGroup" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <label class="checkbox-card cursor-pointer">
+                        <input type="checkbox" name="course" value="幼兒中文課程" class="sr-only">
+                        <div class="flex items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">
+                            <i class="fa-solid fa-pen-nib text-blue-500 mr-3"></i>
+                            <span class="text-gray-700 font-medium">幼兒中文課程</span>
+                        </div>
+                    </label>
+                    <label class="checkbox-card cursor-pointer">
+                        <input type="checkbox" name="course" value="幼兒英文課程" class="sr-only">
+                        <div class="flex items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">
+                            <i class="fa-solid fa-font text-blue-500 mr-3"></i>
+                            <span class="text-gray-700 font-medium">幼兒英文課程</span>
+                        </div>
+                    </label>
+                    <!-- 新增：幼兒暑期課程 -->
+                    <label class="checkbox-card cursor-pointer col-span-1 sm:col-span-2">
+                        <input type="checkbox" name="course" value="暑期課程" class="sr-only">
+                        <div class="flex items-center p-4 border border-orange-300 bg-orange-50/30 rounded-xl hover:bg-orange-50 transition-all">
+                            <i class="fa-solid fa-sun text-amber-500 animate-pulse mr-3"></i>
+                            <span class="text-gray-800 font-bold">☀️ 暑期課程</span>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Primary Courses Group -->
+                <div id="priGroup" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <label class="checkbox-card cursor-pointer">
+                        <input type="checkbox" name="course" value="樂思中文課程" class="sr-only">
+                        <div class="flex items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">
+                            <i class="fa-solid fa-book-quran text-green-600 mr-3"></i>
+                            <span class="text-gray-700 font-medium">樂思中文課程</span>
+                        </div>
+                    </label>
+                    <label class="checkbox-card cursor-pointer">
+                        <input type="checkbox" name="course" value="閱讀及寫作技巧" class="sr-only">
+                        <div class="flex items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">
+                            <i class="fa-solid fa-feather-pointed text-green-600 mr-3"></i>
+                            <span class="text-gray-700 font-medium">閱讀及寫作技巧</span>
+                        </div>
+                    </label>
+                    <label class="checkbox-card cursor-pointer">
+                        <input type="checkbox" name="course" value="樂思英文課程" class="sr-only">
+                        <div class="flex items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">
+                            <i class="fa-solid fa-language text-blue-600 mr-3"></i>
+                            <span class="text-gray-700 font-medium">樂思英文課程</span>
+                        </div>
+                    </label>
+                    <label class="checkbox-card cursor-pointer">
+                        <input type="checkbox" name="course" value="全方位英文寫作" class="sr-only">
+                        <div class="flex items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">
+                            <i class="fa-solid fa-pencil text-blue-600 mr-3"></i>
+                            <span class="text-gray-700 font-medium">全方位英文寫作</span>
+                        </div>
+                    </label>
+                    <label class="checkbox-card cursor-pointer">
+                        <input type="checkbox" name="course" value="樂思數學課程" class="sr-only">
+                        <div class="flex items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">
+                            <i class="fa-solid fa-calculator text-orange-500 mr-3"></i>
+                            <span class="text-gray-700 font-medium">樂思數學課程</span>
+                        </div>
+                    </label>
+                    <label class="checkbox-card cursor-pointer">
+                        <input type="checkbox" name="course" value="常識課程" class="sr-only">
+                        <div class="flex items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">
+                            <i class="fa-solid fa-earth-asia text-teal-600 mr-3"></i>
+                            <span class="text-gray-700 font-medium">常識課程</span>
+                        </div>
+                    </label>
+                    <!-- 新增：小學暑期課程 -->
+                    <label class="checkbox-card cursor-pointer col-span-1 sm:col-span-2">
+                        <input type="checkbox" name="course" value="暑期課程" class="sr-only">
+                        <div class="flex items-center p-4 border border-orange-300 bg-orange-50/30 rounded-xl hover:bg-orange-50 transition-all">
+                            <i class="fa-solid fa-umbrella-beach text-amber-500 animate-bounce mr-3"></i>
+                            <span class="text-gray-800 font-bold">☀️ 暑期課程</span>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Custom Course Option -->
+                <div class="pt-2">
+                    <div class="flex items-center p-4 border border-dashed border-gray-300 rounded-xl bg-gray-50">
+                        <input type="checkbox" id="hasOther" class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500">
+                        <span class="ml-3 text-sm font-medium text-gray-600">其他查詢：</span>
+                        <input type="text" id="otherText" class="ml-2 flex-1 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm" placeholder="請註明課程或問題">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Availability -->
+            <section class="space-y-6">
+                <div class="flex items-center space-x-3 border-b border-gray-100 pb-4">
+                    <div class="bg-blue-600 text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold">3</div>
+                    <h2 class="text-xl font-bold text-gray-800">可上課時間 (可多選)</h2>
+                </div>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-4 sm:grid-cols-7 gap-2">
+                        <!-- Days Selection -->
+                        <template id="day-template">
+                            <label class="cursor-pointer">
+                                <input type="checkbox" name="availDay" value="" class="peer sr-only">
+                                <div class="text-center py-2 border rounded-lg peer-checked:bg-blue-50 peer-checked:border-blue-500 peer-checked:text-blue-700 text-xs font-bold transition-all">DAY</div>
+                            </label>
+                        </template>
+                        <div id="day-container" class="contents"></div>
+                    </div>
+                    <input type="text" id="availTime" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" placeholder="填寫偏好時段 (例如：逢周六 14:00 - 16:00)">
+                </div>
+            </section>
+
+            <!-- 4. Contact Information -->
+            <section class="space-y-6">
+                <div class="flex items-center space-x-3 border-b border-gray-100 pb-4">
+                    <div class="bg-blue-600 text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold">4</div>
+                    <h2 class="text-xl font-bold text-gray-800">聯絡方式</h2>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">家長姓名 <span class="text-red-500">*</span></label>
+                        <input type="text" id="p_name" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white" placeholder="請輸入姓名">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">聯絡電話 (WhatsApp) <span class="text-red-500">*</span></label>
+                        <input type="tel" id="p_tel" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white" placeholder="例如：91234567">
+                    </div>
+                </div>
+            </section>
+
+            <div class="pt-6">
+                <button type="submit" class="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-5 rounded-2xl shadow-xl transition-all transform hover:-translate-y-1 active:scale-[0.98] flex items-center justify-center text-xl">
+                    <i class="fa-brands fa-whatsapp text-2xl mr-3"></i>
+                    透過 WhatsApp 立即查詢
+                </button>
+                <p class="text-center text-[10px] text-gray-400 mt-4 leading-relaxed">
+                    點擊提交後將開啟 WhatsApp 應用程式並自動帶入訊息。<br>
+                    我們承諾保護您的隱私，資料僅用於課程諮詢及行政安排。
+                </p>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Data Configuration
+        const grades = ['K1', 'K2', 'K3', 'P1', 'P2', 'P3', 'P4', 'P5', 'P6'];
+        const days = ['一', '二', '三', '四', '五', '六', '日'];
+        
+        // WhatsApp Config
+        const WHATSAPP_NUMBER = "85260184751"; // XX分校電話
+
+        // DOM Elements
+        const gradeContainer = document.getElementById('grade-container');
+        const dayContainer = document.getElementById('day-container');
+        const gradeTemplate = document.getElementById('grade-template');
+        const dayTemplate = document.getElementById('day-template');
+        const courseSection = document.getElementById('courseSection');
+        const kgGroup = document.getElementById('kgGroup');
+        const priGroup = document.getElementById('priGroup');
+        const form = document.getElementById('mainInquiryForm');
+
+        function init() {
+            // Render Grades
+            grades.forEach(g => {
+                const clone = gradeTemplate.content.cloneNode(true);
+                const input = clone.querySelector('input');
+                const div = clone.querySelector('div');
+                input.value = g;
+                div.textContent = g;
+                gradeContainer.appendChild(clone);
+            });
+
+            // Render Days
+            days.forEach(d => {
+                const clone = dayTemplate.content.cloneNode(true);
+                const input = clone.querySelector('input');
+                const div = clone.querySelector('div');
+                input.value = d;
+                div.textContent = d;
+                if(d === '六' || d === '日') div.classList.add('text-red-500', 'border-red-100');
+                dayContainer.appendChild(clone);
+            });
+
+            // Set up listeners for grade change
+            document.querySelectorAll('input[name="grade"]').forEach(radio => {
+                radio.addEventListener('change', handleGradeChange);
+            });
+        }
+
+        function handleGradeChange(e) {
+            const val = e.target.value;
+            courseSection.classList.remove('opacity-40', 'pointer-events-none');
+            
+            // Reset all checkboxes in section 2
+            document.querySelectorAll('input[name="course"]').forEach(c => c.checked = false);
+
+            if (val.startsWith('K')) {
+                kgGroup.classList.remove('hidden');
+                priGroup.classList.add('hidden');
+            } else {
+                priGroup.classList.remove('hidden');
+                kgGroup.classList.add('hidden');
+            }
+        }
+
+        form.onsubmit = (e) => {
+            e.preventDefault();
+
+            // 1. Basic Fields
+            const sName = document.getElementById('stu_name').value;
+            const pName = document.getElementById('p_name').value;
+            const pTel = document.getElementById('p_tel').value;
+            const grade = document.querySelector('input[name="grade"]:checked').value;
+            const timeDesc = document.getElementById('availTime').value;
+
+            // 2. Multi-selects
+            const selectedDays = Array.from(document.querySelectorAll('input[name="availDay"]:checked'))
+                                      .map(cb => `周${cb.value}`);
+            
+            let courses = Array.from(document.querySelectorAll('input[name="course"]:checked'))
+                               .map(cb => cb.value);
+            
+            // 3. Logic for "Other"
+            if (document.getElementById('hasOther').checked) {
+                const custom = document.getElementById('otherText').value.trim();
+                courses.push(custom ? `其他查詢: ${custom}` : "其他課程查詢");
+            }
+
+            if (courses.length === 0) {
+                showFeedback('請至少選擇一項感興趣的課程。', 'error');
+                return;
+            }
+
+            // 4. Message Construction
+            let msg = `*【新課程報名查詢】*\n\n`;
+            msg += `👤 *學生姓名：* ${sName}\n`;
+            msg += `🎓 *就讀年級：* ${grade}\n\n`;
+            msg += `📚 *感興趣課程：*\n`;
+            courses.forEach(c => msg += `• ${c}\n`);
+            msg += `\n⏰ *可上課時間：*\n`;
+            msg += `• 日期：${selectedDays.length > 0 ? selectedDays.join(', ') : '未指定'}\n`;
+            msg += `• 備註：${timeDesc || '無'}\n\n`;
+            msg += `📞 *家長聯絡：*\n`;
+            msg += `• 姓名：${pName}\n`;
+            msg += `• 電話：${pTel}\n\n`;
+            msg += `--- 提交自網上查詢表 ---`;
+
+            // 5. Execution
+            const finalUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+            window.open(finalUrl, '_blank');
+        };
+
+        // Utility: Toast/Feedback helper
+        function showFeedback(text, type) {
+            const toast = document.createElement('div');
+            toast.className = `fixed top-10 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl text-white font-bold transition-all z-50 ${type === 'error' ? 'bg-red-500' : 'bg-green-500'}`;
+            toast.textContent = text;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+
+        // Run Init
+        window.onload = init;
+    </script>
+</body>
+</html>
